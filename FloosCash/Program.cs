@@ -1,5 +1,6 @@
 using FloosCash.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,16 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 1. إضافة خدمة المصادقة (Authentication)
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login"; // الصفحة التي سيتم تحويل غير المسجلين إليها
+        options.AccessDeniedPath = "/AccessDenied"; // صفحة "ممنوع الدخول" إذا حاول كاشير فتح صفحة مدير
+        options.ExpireTimeSpan = TimeSpan.FromHours(12); // مدة بقاء تسجيل الدخول
+    });
+
 
 var app = builder.Build();
 
@@ -24,7 +35,9 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapStaticAssets();
 app.MapRazorPages()

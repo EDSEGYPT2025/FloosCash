@@ -23,6 +23,35 @@
 }
 else
 {
+    @if (Model.Alerts.Any())
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                @foreach (var alert in Model.Alerts)
+                {
+                    <div class="alert alert-@alert.Type alert-dismissible shadow-sm mb-2" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                @if (alert.Type == "danger")
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 9v2m0 4v.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg>
+                                }
+                                else
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 9v2m0 4v.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg>
+                                }
+                            </div>
+                            <div>
+                                <h4 class="alert-title fw-bold mb-1">تنبيه محفظة: @alert.WalletName</h4>
+                                <div class="text-muted fs-4">@alert.Message</div>
+                            </div>
+                        </div>
+                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
     <div class="row row-deck row-cards">
 
         <div class="col-sm-6 col-lg-3">
@@ -58,7 +87,7 @@ else
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="subheader">أرباح العمولات (اليوم)</div>
+                        <div class="subheader">أرباح العمولات (الوردية)</div>
                         <div class="ms-auto text-success">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                         </div>
@@ -75,7 +104,7 @@ else
                     <h3 class="card-title fs-4 mb-2">الكاشير: @Model.ActiveShift.EmployeeName</h3>
                     <div class="text-muted mb-3 fs-5">وقت الفتح: @Model.ActiveShift.StartTime.ToString("hh:mm tt")</div>
 
-                    <a href="#" class="btn btn-outline-danger w-100 mt-2 fw-bold">
+                    <a href="/Shifts/Close" class="btn btn-outline-danger w-100 mt-2 fw-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
                         إغلاق الوردية وتسوية العهدة
                     </a>

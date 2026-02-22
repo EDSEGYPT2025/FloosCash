@@ -97,6 +97,52 @@ namespace FloosCash.Migrations
                     b.ToTable("Shifts");
                 });
 
+            modelBuilder.Entity("FloosCash.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FullName = "مدير النظام",
+                            IsActive = true,
+                            Password = "123",
+                            Role = "Admin",
+                            Username = "admin"
+                        });
+                });
+
             modelBuilder.Entity("FloosCash.Models.Wallet", b =>
                 {
                     b.Property<int>("Id")
@@ -144,6 +190,36 @@ namespace FloosCash.Migrations
                     b.ToTable("Wallets");
                 });
 
+            modelBuilder.Entity("ShiftUser", b =>
+                {
+                    b.Property<int>("CashiersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShiftsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CashiersId", "ShiftsId");
+
+                    b.HasIndex("ShiftsId");
+
+                    b.ToTable("ShiftUser");
+                });
+
+            modelBuilder.Entity("ShiftWallet", b =>
+                {
+                    b.Property<int>("AllowedWalletsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShiftsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AllowedWalletsId", "ShiftsId");
+
+                    b.HasIndex("ShiftsId");
+
+                    b.ToTable("ShiftWallet");
+                });
+
             modelBuilder.Entity("FloosCash.Models.Operation", b =>
                 {
                     b.HasOne("FloosCash.Models.Shift", "Shift")
@@ -161,6 +237,36 @@ namespace FloosCash.Migrations
                     b.Navigation("Shift");
 
                     b.Navigation("Wallet");
+                });
+
+            modelBuilder.Entity("ShiftUser", b =>
+                {
+                    b.HasOne("FloosCash.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("CashiersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FloosCash.Models.Shift", null)
+                        .WithMany()
+                        .HasForeignKey("ShiftsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShiftWallet", b =>
+                {
+                    b.HasOne("FloosCash.Models.Wallet", null)
+                        .WithMany()
+                        .HasForeignKey("AllowedWalletsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FloosCash.Models.Shift", null)
+                        .WithMany()
+                        .HasForeignKey("ShiftsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FloosCash.Models.Shift", b =>

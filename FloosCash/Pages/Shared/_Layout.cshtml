@@ -96,13 +96,15 @@
                 <div class="collapse navbar-collapse" id="sidebar-menu">
                     <div class="d-flex flex-column h-100 w-100 mt-lg-4 mt-3">
 
-                        <div class="mb-4 px-2 w-100">
-                            <a href="/Shifts/Create" class="btn-shift-action text-decoration-none w-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 2" /><path d="M12 7v5" /></svg>
-                                فتح وردية جديدة
-                            </a>
-                        </div>
-
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="mb-4 px-2 w-100">
+                                <a href="/Shifts/Create" class="btn-shift-action text-decoration-none w-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 2" /><path d="M12 7v5" /></svg>
+                                    فتح وردية جديدة
+                                </a>
+                            </div>
+                        }
                         <ul class="navbar-nav w-100 flex-grow-1">
                             <div class="nav-item-header">الإدارة والتسويات</div>
                             <li class="nav-item">
@@ -124,26 +126,57 @@
                                 </a>
                             </li>
 
-                            <div class="nav-item-header">إعدادات النظام</div>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Wallets/Index">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-info">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
-                                    </span>
-                                    <span class="nav-link-title">المحافظ المالية</span>
-                                </a>
-                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="nav-item-header">التقارير والمراقبة</div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Shifts/History">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-success">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 -2h-2a2 2 0 0 1 -2 -2z" /><path d="M14 11h-4v-4" /><path d="M14 15h-4" /></svg>
+                                        </span>
+                                        <span class="nav-link-title">سجل الورديات (التقفيل)</span>
+                                    </a>
+                                </li>
+
+                                <div class="nav-item-header">إعدادات النظام</div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Wallets/Index">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-info">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                                        </span>
+                                        <span class="nav-link-title">المحافظ المالية</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Users/Index">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-purple">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></svg>
+                                        </span>
+                                        <span class="nav-link-title">إدارة المستخدمين</span>
+                                    </a>
+                                </li>
+                            }
                         </ul>
 
                         <div class="sidebar-user-profile w-100 mt-auto d-print-none">
-                            <div class="d-flex align-items-center">
-                                <span class="avatar avatar-sm rounded-circle bg-primary text-white">أس</span>
-                                <div class="ms-3">
-                                    <div class="text-white fw-bold fs-4" style="line-height: 1;">أحمد سمير</div>
-                                    <div class="text-success fs-5 mt-1 d-flex align-items-center">
-                                        <span class="badge bg-success badge-blink me-1" style="width: 8px; height: 8px; padding: 0;"></span> متصل بالوردية
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <span class="avatar avatar-sm rounded-circle bg-primary text-white fw-bold">
+                                        @(User.Identity?.Name?.FirstOrDefault().ToString() ?? "م")
+                                    </span>
+                                    <div class="ms-3">
+                                        <div class="text-white fw-bold fs-4" style="line-height: 1;">
+                                            @(User.Identity?.Name ?? "مستخدم")
+                                        </div>
+                                        <div class="text-success fs-5 mt-1 d-flex align-items-center">
+                                            <span class="badge bg-success badge-blink me-1" style="width: 8px; height: 8px; padding: 0;"></span>
+                                            @(User.IsInRole("Admin") ? "مدير النظام" : "كاشير")
+                                        </div>
                                     </div>
                                 </div>
+                                <a href="/Logout" class="btn btn-sm btn-outline-danger btn-icon border-0" title="تسجيل الخروج">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M9 12h12l-3 -3" /><path d="M18 15l3 -3" /></svg>
+                                </a>
                             </div>
                         </div>
 
@@ -153,7 +186,7 @@
         </aside>
 
         <div class="page-wrapper">
-            <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom bg-white">
+            <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom bg-white shadow-sm">
                 <div class="container-xl">
                     <div class="navbar-nav flex-row ms-auto">
                         <div class="nav-item d-none d-md-flex me-3">

@@ -25,5 +25,12 @@ namespace FloosCash.Models
 
         // العلاقة: الوردية الواحدة تحتوي على عدة عمليات
         public ICollection<Operation> Operations { get; set; } = new List<Operation>();
+
+        // المحافظ المسموح للموظف التعامل معها في هذه الوردية
+        public ICollection<Wallet> AllowedWallets { get; set; } = new List<Wallet>();
+
+        // قائمة الموظفين (الكاشيرية) المربوطين بهذه الوردية
+        public ICollection<User> Cashiers { get; set; } = new List<User>();
+
     }
 }

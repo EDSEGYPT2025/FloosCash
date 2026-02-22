@@ -1,0 +1,58 @@
+﻿@page
+@model FloosCash.Pages.Users.IndexModel
+@{
+    ViewData["Title"] = "إدارة المستخدمين والموظفين";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title fw-bold">قائمة حسابات النظام</h3>
+        <a href="/Users/Create" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M16 19h6" /><path d="M19 16v6" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4" /></svg>
+            إضافة مستخدم جديد
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap datatable table-hover">
+            <thead>
+                <tr>
+                    <th>الاسم بالكامل</th>
+                    <th>اسم الدخول (Username)</th>
+                    <th>الصلاحية (Role)</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.UsersList)
+                {
+                    <tr>
+                        <td class="fw-bold fs-3">@user.FullName</td>
+                        <td>@user.Username</td>
+                        <td>
+                            @if (user.Role == "Admin")
+                            {
+                                <span class="badge bg-purple-lt fs-5">مدير نظام</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-blue-lt fs-5">كاشير</span>
+                            }
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="badge bg-success">نشط</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-danger">موقوف</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -40,5 +40,8 @@ namespace FloosCash.Models
         public decimal MonthlyWithdrawalLimit { get; set; } = 200000; // حد السحب الشهري
 
         public bool IsActive { get; set; } = true;
+
+        // الورديات التي تم السماح لها باستخدام هذه المحفظة
+        public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
     }
 }

@@ -1,0 +1,113 @@
+﻿@page
+@model FloosCash.Pages.Shifts.CloseModel
+@{
+    ViewData["Title"] = "إغلاق الوردية وتسوية العهدة";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title fw-bold">تسوية وتقفيل وردية الكاشير: @Model.ActiveShift.EmployeeName</h3>
+            </div>
+            <div class="card-body">
+
+                <div class="row text-center mb-4 g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted mb-1 fs-4">الرصيد الافتتاحي</div>
+                        <div class="fs-2 fw-bold">@Model.ActiveShift.OpeningCash.ToString("N2") ج</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted mb-1 fs-4">إجمالي الإيداعات</div>
+                        <div class="fs-2 fw-bold text-success">+ @Model.TotalDeposits.ToString("N2") ج</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted mb-1 fs-4">إجمالي السحوبات</div>
+                        <div class="fs-2 fw-bold text-danger">- @Model.TotalWithdrawals.ToString("N2") ج</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted mb-1 fs-4">إجمالي العمولات</div>
+                        <div class="fs-2 fw-bold text-primary">+ @Model.TotalCommissions.ToString("N2") ج</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 shadow-none text-center rounded-3 p-3 mb-4">
+                    <div class="fs-4 mb-2 text-muted">النقدية المتوقعة بالدرج (سيستم)</div>
+                    <div class="display-5 fw-bold text-primary" id="expected-cash-display" data-expected="@Model.ExpectedCash">
+                        @Model.ExpectedCash.ToString("N2") ج.م
+                    </div>
+                </div>
+
+                <form method="post">
+                    <div class="row align-items-center">
+                        <div class="col-md-7 mb-3">
+                            <label class="form-label fs-3 fw-bold required">النقدية الفعلية (الموجودة بالدرج حالياً):</label>
+                            <div class="input-group input-group-flat">
+                                <input asp-for="ActualCash" type="number" step="0.01" class="form-control form-control-lg text-end fs-2 fw-bold" id="actual-cash-input" required autocomplete="off" />
+                                <span class="input-group-text fw-bold fs-3">ج.م</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 mb-3">
+                            <div class="card shadow-none border" id="difference-card">
+                                <div class="card-body text-center p-3">
+                                    <div class="text-muted fs-4 mb-1">حالة العهدة (عجز / زيادة)</div>
+                                    <div class="fs-2 fw-bold" id="difference-display">0.00 ج.م</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="/Index" class="btn btn-secondary btn-lg me-2">تراجع</a>
+                        <button type="submit" class="btn btn-danger btn-lg" onclick="return confirm('هل أنت متأكد من إغلاق الوردية وتسجيل العهدة بشكل نهائي؟');">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
+                            إغلاق الوردية الآن
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const expectedCashDisplay = document.getElementById('expected-cash-display');
+            const actualCashInput = document.getElementById('actual-cash-input');
+            const differenceDisplay = document.getElementById('difference-display');
+            const differenceCard = document.getElementById('difference-card');
+
+            // جلب القيمة المتوقعة من الخصائص
+            const expectedCash = parseFloat(expectedCashDisplay.getAttribute('data-expected')) || 0;
+
+            function calculateDifference() {
+                const actualCash = parseFloat(actualCashInput.value) || 0;
+                const diff = actualCash - expectedCash;
+
+                differenceDisplay.textContent = Math.abs(diff).toFixed(2) + " ج.م";
+
+                if (diff === 0) {
+                    differenceDisplay.textContent = "مضبوطة ✅";
+                    differenceDisplay.className = "fs-2 fw-bold text-success";
+                    differenceCard.className = "card shadow-none border border-success bg-success-lt";
+                } else if (diff > 0) {
+                    differenceDisplay.textContent = "+ " + Math.abs(diff).toFixed(2) + " ج.م (زيادة)";
+                    differenceDisplay.className = "fs-2 fw-bold text-primary";
+                    differenceCard.className = "card shadow-none border border-primary bg-primary-lt";
+                } else {
+                    differenceDisplay.textContent = "- " + Math.abs(diff).toFixed(2) + " ج.م (عجز)";
+                    differenceDisplay.className = "fs-2 fw-bold text-danger";
+                    differenceCard.className = "card shadow-none border border-danger bg-danger-lt";
+                }
+            }
+
+            // تشغيل الحساب فور تحميل الصفحة وعند كتابة أي رقم
+            calculateDifference();
+            actualCashInput.addEventListener('input', calculateDifference);
+        });
+    </script>
+}

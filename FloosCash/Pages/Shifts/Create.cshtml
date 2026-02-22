@@ -10,17 +10,39 @@
             <div class="card-header bg-primary text-white">
                 <h3 class="card-title text-white d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 2" /><path d="M12 7v5" /></svg>
-                    تسجيل عهدة بداية اليوم
+                    تسجيل عهدة بداية اليوم وتحديد الصلاحيات
                 </h3>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label class="form-label required">اسم الموظف / الكاشير</label>
-                        <input asp-for="Shift.EmployeeName" class="form-control form-control-lg" required />
-                        <span asp-validation-for="Shift.EmployeeName" class="text-danger"></span>
+                        <label class="form-label fs-4 fw-bold required text-primary">حدد موظفي الوردية (كاشير واحد أو أكثر):</label>
+                        <div class="row g-2">
+                            @foreach (var cashier in Model.AvailableCashiers)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-selectgroup-item flex-fill w-100">
+                                        <input type="checkbox" name="SelectedCashierIds" value="@cashier.Id" class="form-selectgroup-input">
+                                        <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                            <div class="me-3">
+                                                <span class="form-selectgroup-check"></span>
+                                            </div>
+                                            <div class="text-start">
+                                                <span class="fw-bold fs-3 d-block">@cashier.FullName</span>
+                                                <span class="text-muted fs-5">@cashier.Username</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState["SelectedCashierIds"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger d-block mt-2 fw-bold">@ViewData.ModelState["SelectedCashierIds"].Errors[0].ErrorMessage</span>
+                        }
                     </div>
-                    <div class="col-md-12 mb-3">
+
+                    <div class="col-md-12 mb-4">
                         <label class="form-label required">رصيد الدرج الافتتاحي (النقدية المسلمة)</label>
                         <div class="input-group input-group-flat">
                             <span class="input-group-text bg-light fw-bold text-success">ج.م</span>
@@ -28,6 +50,33 @@
                         </div>
                         <span class="form-hint mt-2">المبلغ النقدي المسلم للموظف في بداية الوردية (الفكة لتسيير العمل).</span>
                         <span asp-validation-for="Shift.OpeningCash" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fs-4 fw-bold required text-primary">حدد المحافظ المسموح للموظف التعامل معها في هذه الوردية:</label>
+                        <div class="row g-2">
+                            @foreach (var wallet in Model.AvailableWallets)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-selectgroup-item flex-fill w-100">
+                                        <input type="checkbox" name="SelectedWalletIds" value="@wallet.Id" class="form-selectgroup-input">
+                                        <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                            <div class="me-3">
+                                                <span class="form-selectgroup-check"></span>
+                                            </div>
+                                            <div class="text-start">
+                                                <span class="fw-bold fs-3 d-block">@wallet.Name</span>
+                                                <span class="text-muted fs-5">الرصيد: @wallet.CurrentBalance.ToString("N0") ج</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState["SelectedWalletIds"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger d-block mt-2 fw-bold">@ViewData.ModelState["SelectedWalletIds"].Errors[0].ErrorMessage</span>
+                        }
                     </div>
                 </div>
             </div>

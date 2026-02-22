@@ -1,0 +1,55 @@
+﻿@page
+@model FloosCash.Pages.Shifts.HistoryModel
+@{
+    ViewData["Title"] = "سجل الورديات وتقارير العهدة";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="card-title fw-bold">الورديات المغلقة السابقة</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap datatable table-hover">
+            <thead>
+                <tr>
+                    <th>الكاشير</th>
+                    <th>وقت الفتح</th>
+                    <th>وقت الإغلاق</th>
+                    <th>العهدة المتوقعة (سيستم)</th>
+                    <th>العهدة الفعلية (درج)</th>
+                    <th>العجز / الزيادة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var shift in Model.ClosedShifts)
+                {
+                    <tr>
+                        <td class="fw-bold fs-3">@shift.EmployeeName</td>
+                        <td class="text-muted">@shift.StartTime.ToString("yyyy-MM-dd hh:mm tt")</td>
+                        <td class="text-muted">@shift.EndTime?.ToString("yyyy-MM-dd hh:mm tt")</td>
+                        <td class="text-primary fw-bold">@shift.ExpectedCash.ToString("N2") ج</td>
+                        <td class="fw-bold">@shift.ActualCash.ToString("N2") ج</td>
+                        <td>
+                            @if (shift.Difference == 0)
+                            {
+                                <span class="badge bg-success-lt fs-4">مضبوطة ✅</span>
+                            }
+                            else if (shift.Difference > 0)
+                            {
+                                <span class="badge bg-primary-lt fs-4 text-primary">+ @Math.Abs(shift.Difference).ToString("N2") ج (زيادة)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-lt fs-4 text-danger">- @Math.Abs(shift.Difference).ToString("N2") ج (عجز)</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.ClosedShifts.Any())
+                {
+                    <tr><td colspan="6" class="text-center py-4 text-muted">لا توجد ورديات مغلقة حتى الآن.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

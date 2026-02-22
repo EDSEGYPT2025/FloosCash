@@ -138,45 +138,76 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // 1. تفعيل خاصية البحث على قائمة المحافظ
+            // --- 1. جلب بيانات العمولات من السيرفر ---
+            const walletsData = @Html.Raw(Model.WalletsJson ?? "[]");
+
+            const amountInput = document.querySelector('input[name="Operation.Amount"]');
+            const commissionInput = document.querySelector('input[name="Operation.Commission"]');
+            const typeRadios = document.querySelectorAll('input[name="Operation.OperationType"]');
+            const walletSelect = document.getElementById('wallet-select');
+
+            // دالة حساب العمولة
+            function calculateCommission() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const walletId = parseInt(walletSelect.value);
+                const selectedType = document.querySelector('input[name="Operation.OperationType"]:checked').value;
+
+                if (!walletId || amount <= 0) {
+                    return; // لا تحسب شيء إذا لم يكتمل الإدخال
+                }
+
+                const wallet = walletsData.find(w => w.id === walletId);
+                if (wallet) {
+                    let rate = selectedType === 'إيداع' ? wallet.depositRate : wallet.withdrawalRate;
+                    let commission = amount * (rate / 100);
+                    commissionInput.value = commission.toFixed(2);
+                }
+            }
+
+            // --- 2. تفعيل خاصية البحث (TomSelect) مع ربطها بالحساب التلقائي ---
             if (document.getElementById('wallet-select')) {
-                new TomSelect("#wallet-select", {
+                let ts = new TomSelect("#wallet-select", {
                     create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
+                    sortField: { field: "text", direction: "asc" },
                     placeholder: "-- اكتب للبحث عن المحفظة --",
                     render: {
-                        // إضافة رسالة بالعربي عند عدم العثور على نتائج
                         no_results: function(data, escape) {
                             return '<div class="no-results p-2 text-danger fw-bold">لا توجد محفظة بهذا الاسم</div>';
                         }
                     }
                 });
+
+                // تشغيل الحساب التلقائي عند تغيير المحفظة من القائمة
+                ts.on('change', function() {
+                    calculateCommission();
+                });
             }
 
-            // 2. كود رسالة النجاح
+            // --- 3. تشغيل الحساب التلقائي عند كتابة المبلغ أو تغيير نوع العملية ---
+            amountInput.addEventListener('input', calculateCommission);
+            typeRadios.forEach(radio => radio.addEventListener('change', calculateCommission));
+
+            // --- 4. كود رسالة النجاح ---
             @if (TempData["SuccessMessage"] != null)
             {
-                        <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تمت العملية بنجاح',
-                            text: '@Html.Raw(TempData["SuccessMessage"])',
-                            confirmButtonText: 'متابعة العمل',
-                            confirmButtonColor: '#2fb344',
-                            background: '#ffffff',
-                            color: '#1e293b',
-                            backdrop: `rgba(0, 0, 0, 0.4)`,
-                            allowOutsideClick: false,
-                            customClass: {
-                                title: 'fs-2 fw-bold',
-                                popup: 'rounded-4 shadow-lg border-0',
-                                confirmButton: 'btn btn-success btn-lg px-4'
-                            }
-                        });
-                        </text>
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تمت العملية بنجاح',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        confirmButtonText: 'متابعة العمل',
+                        confirmButtonColor: '#2fb344',
+                        background: '#ffffff',
+                        color: '#1e293b',
+                        backdrop: `rgba(0, 0, 0, 0.4)`,
+                        allowOutsideClick: false,
+                        customClass: {
+                            title: 'fs-2 fw-bold',
+                            popup: 'rounded-4 shadow-lg border-0',
+                            confirmButton: 'btn btn-success btn-lg px-4'
+                        }
+                    });
+                    </text>
             }
         });
     </script>
