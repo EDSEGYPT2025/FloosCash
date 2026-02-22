@@ -1,0 +1,145 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "لوحة القيادة (ملخص اليوم)";
+}
+
+@if (Model.ActiveShift == null)
+{
+    <div class="empty">
+        <div class="empty-icon text-muted">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 2" /><path d="M12 7v5" /></svg>
+        </div>
+        <p class="empty-title fs-2 fw-bold">لا توجد وردية مفتوحة حالياً</p>
+        <p class="empty-subtitle text-muted fs-4">
+            للبدء في تسجيل العمليات ورؤية الإحصائيات، يرجى فتح وردية جديدة وتسجيل عهدة الكاشير.
+        </p>
+        <div class="empty-action">
+            <a href="/Shifts/Create" class="btn btn-primary btn-lg">
+                فتح وردية جديدة
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row row-deck row-cards">
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card bg-primary text-primary-fg shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader text-white">النقدية المتوقعة بالدرج</div>
+                    </div>
+                    <div class="h1 mb-3 mt-2 fw-bold">@Model.ExpectedDrawerCash.ToString("N2") ج.م</div>
+                    <div class="d-flex mb-2 fs-5">
+                        <div>الرصيد الافتتاحي كان: @Model.ActiveShift.OpeningCash.ToString("N0") ج</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader">إجمالي أرصدة المحافظ</div>
+                        <div class="ms-auto text-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                        </div>
+                    </div>
+                    <div class="h1 mb-3 mt-2 fw-bold text-blue">@Model.TotalWalletsBalance.ToString("N2") ج.م</div>
+                    <div class="text-muted fs-5">سيولة الشركة في المحافظ النشطة</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="subheader">أرباح العمولات (اليوم)</div>
+                        <div class="ms-auto text-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                        </div>
+                    </div>
+                    <div class="h1 mb-3 mt-2 fw-bold text-success">@Model.TotalCommissions.ToString("N2") ج.م</div>
+                    <div class="text-muted fs-5">من إجمالي @Model.TotalOperationsCount عملية مسجلة</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <h3 class="card-title fs-4 mb-2">الكاشير: @Model.ActiveShift.EmployeeName</h3>
+                    <div class="text-muted mb-3 fs-5">وقت الفتح: @Model.ActiveShift.StartTime.ToString("hh:mm tt")</div>
+
+                    <a href="#" class="btn btn-outline-danger w-100 mt-2 fw-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
+                        إغلاق الوردية وتسوية العهدة
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title text-muted fw-bold">أحدث العمليات المسجلة بالوردية</h3>
+                    <a href="/Operations/Create" class="btn btn-sm btn-primary">تسجيل عملية جديدة</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable table-hover">
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>نوع العملية</th>
+                                <th>المحفظة</th>
+                                <th>المبلغ</th>
+                                <th>العمولة</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentOperations.Any())
+                            {
+                                @foreach (var op in Model.RecentOperations)
+                                {
+                                    <tr>
+                                        <td class="text-muted">@op.Timestamp.ToString("hh:mm:ss tt")</td>
+                                        <td>
+                                            @if (op.OperationType == "إيداع")
+                                            {
+                                                <span class="badge bg-success-lt fs-5"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M18 13l-6 6" /><path d="M6 13l6 6" /></svg> إيداع</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-lt fs-5"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M18 11l-6 -6" /><path d="M6 11l6 -6" /></svg> سحب</span>
+                                            }
+                                        </td>
+                                        <td class="fw-bold">@op.Wallet.Name</td>
+                                        <td class="fw-bold fs-3 @(op.OperationType == "إيداع" ? "text-success" : "text-danger")">
+                                            @op.Amount.ToString("N0") ج
+                                        </td>
+                                        <td>@op.Commission ج</td>
+                                        <td class="text-muted text-truncate" style="max-width: 150px;">
+                                            @(string.IsNullOrEmpty(op.Notes) ? "-" : op.Notes)
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">لم يتم تسجيل أي عمليات في هذه الوردية حتى الآن.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}

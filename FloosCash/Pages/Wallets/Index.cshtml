@@ -1,0 +1,113 @@
+﻿@page
+@model FloosCash.Pages.Wallets.IndexModel
+@{
+    ViewData["Title"] = "المحافظ المالية";
+}
+
+<div class="row row-cards">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h3 class="card-title text-primary fw-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                    قائمة المحافظ المتاحة
+                </h3>
+                <a asp-page="./Create" class="btn btn-primary d-none d-sm-inline-flex align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                    إضافة محفظة جديدة
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table card-table table-vcenter text-nowrap datatable table-hover">
+                    <thead>
+                        <tr>
+                            <th>اسم المحفظة / الرقم</th>
+                            <th>النوع</th>
+                            <th>الرصيد الحالي</th>
+                            <th>العمولات (إيداع / سحب)</th>
+                            <th>الحدود اليومية (إيداع / سحب)</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Wallets.Any())
+                        {
+                            @foreach (var item in Model.Wallets)
+                            {
+                                <tr>
+                                    <td><span class="text-reset fw-bold fs-4">@item.Name</span></td>
+                                    <td>
+                                        @if (item.Type == "VodafoneCash")
+                                        {
+                                            <span class="badge bg-red-lt fs-5">فودافون كاش</span>
+                                        }
+                                        else if (item.Type == "EtisalatCash")
+                                        {
+                                            <span class="badge bg-green-lt fs-5">اتصالات كاش</span>
+                                        }
+                                        else if (item.Type == "InstaPay")
+                                        {
+                                            <span class="badge bg-purple-lt fs-5">إنستا باي</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-blue-lt fs-5">درج نقدية</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary fs-3">@item.CurrentBalance.ToString("N2") ج.م</strong>
+                                    </td>
+                                    <td>
+                                        <div class="text-success mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M18 13l-6 6" /><path d="M6 13l6 6" /></svg>
+                                            إيداع: @item.DepositCommissionRate %
+                                        </div>
+                                        <div class="text-danger">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M18 11l-6 -6" /><path d="M6 11l6 -6" /></svg>
+                                            سحب: @item.WithdrawalCommissionRate %
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-muted mb-1 fs-5">
+                                            حد الإيداع: @item.DailyDepositLimit.ToString("N0") ج
+                                        </div>
+                                        <div class="text-muted fs-5">
+                                            حد السحب: @item.DailyWithdrawalLimit.ToString("N0") ج
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="status status-green">نشط</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status status-red">موقوف</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+                                            تعديل
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xl mb-3 text-gray-400 d-block mx-auto" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /><path d="M3 3l18 18" /></svg>
+                                    <span class="fs-3">لا توجد محافظ مسجلة حتى الآن.</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

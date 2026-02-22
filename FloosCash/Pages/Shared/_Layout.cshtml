@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>@ViewData["Title"] - فلوس كاش</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/core@latest/dist/css/tabler.rtl.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@@tabler/core@latest/dist/css/tabler-vendors.rtl.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body, h1, h2, h3, h4, h5, h6, .btn, .nav-link, .nav-link-title {
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        .navbar-vertical {
+            background-color: #1e293b !important;
+            border-left: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .navbar-vertical .nav-link {
+                border-radius: 8px;
+                margin: 2px 12px;
+                padding: 10px 15px;
+                transition: all 0.3s ease;
+                color: #94a3b8 !important;
+            }
+
+                .navbar-vertical .nav-link:hover {
+                    background-color: rgba(255, 255, 255, 0.08);
+                    color: #ffffff !important;
+                    transform: translateX(-5px);
+                }
+
+            .navbar-vertical .nav-item.active .nav-link {
+                background-color: #206bc4;
+                color: #ffffff !important;
+                box-shadow: 0 4px 10px rgba(32, 107, 196, 0.2);
+            }
+
+        .nav-item-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            padding: 15px 20px 5px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-shift-action {
+            background: linear-gradient(45deg, #2fb344, #238b34);
+            border: none;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(47, 179, 68, 0.3);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+            .btn-shift-action:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(47, 179, 68, 0.5);
+                background: linear-gradient(45deg, #35c74b, #289e3b);
+            }
+
+        .sidebar-user-profile {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body class="layout-fluid">
+    <div class="page">
+        <aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <h1 class="navbar-brand navbar-brand-autodark">
+                    <a href="/" class="text-decoration-none d-flex align-items-center">
+                        <span class="bg-primary text-white p-2 rounded-3 me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-wallet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                        </span>
+                        <span class="fs-2 fw-bolder text-white">فلوس كاش</span>
+                    </a>
+                </h1>
+
+                <div class="collapse navbar-collapse" id="sidebar-menu">
+                    <div class="d-flex flex-column h-100 w-100 mt-lg-4 mt-3">
+
+                        <div class="mb-4 px-2 w-100">
+                            <a href="/Shifts/Create" class="btn-shift-action text-decoration-none w-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 2" /><path d="M12 7v5" /></svg>
+                                فتح وردية جديدة
+                            </a>
+                        </div>
+
+                        <ul class="navbar-nav w-100 flex-grow-1">
+                            <div class="nav-item-header">الإدارة والتسويات</div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 4h6v8h-6z" /><path d="M4 16h6v4h-6z" /><path d="M14 12h6v8h-6z" /><path d="M14 4h6v4h-6z" /></svg>
+                                    </span>
+                                    <span class="nav-link-title">لوحة القيادة (الرئيسية)</span>
+                                </a>
+                            </li>
+
+                            <div class="nav-item-header">نقاط البيع والعمليات</div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Operations/Create">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 -2h-2a2 2 0 0 1 -2 -2z" /></svg>
+                                    </span>
+                                    <span class="nav-link-title">سجل العمليات اليومية</span>
+                                </a>
+                            </li>
+
+                            <div class="nav-item-header">إعدادات النظام</div>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Wallets/Index">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-info">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                                    </span>
+                                    <span class="nav-link-title">المحافظ المالية</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="sidebar-user-profile w-100 mt-auto d-print-none">
+                            <div class="d-flex align-items-center">
+                                <span class="avatar avatar-sm rounded-circle bg-primary text-white">أس</span>
+                                <div class="ms-3">
+                                    <div class="text-white fw-bold fs-4" style="line-height: 1;">أحمد سمير</div>
+                                    <div class="text-success fs-5 mt-1 d-flex align-items-center">
+                                        <span class="badge bg-success badge-blink me-1" style="width: 8px; height: 8px; padding: 0;"></span> متصل بالوردية
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="page-wrapper">
+            <header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom bg-white">
+                <div class="container-xl">
+                    <div class="navbar-nav flex-row ms-auto">
+                        <div class="nav-item d-none d-md-flex me-3">
+                            <span class="badge bg-green-lt text-green fs-4 py-2 px-3 border border-green rounded-pill shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>
+                                حالة النظام: يعمل بكفاءة
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-header d-print-none mt-4">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title fs-1 fw-bold text-dark">
+                                @ViewData["Title"]
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div class="container-xl">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@@tabler/core@latest/dist/js/tabler.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
