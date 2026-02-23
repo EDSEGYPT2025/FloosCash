@@ -116,19 +116,29 @@
                                 </a>
                             </li>
 
-                            <div class="nav-item-header">نقاط البيع والعمليات</div>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Operations/Create">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 -2h-2a2 2 0 0 1 -2 -2z" /></svg>
-                                    </span>
-                                    <span class="nav-link-title">سجل العمليات اليومية</span>
-                                </a>
-                            </li>
-
+                            @if (User.IsInRole("Cashier"))
+                            {
+                                <div class="nav-item-header">نقاط البيع والعمليات</div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Operations/Create">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 -2h-2a2 2 0 0 1 -2 -2z" /></svg>
+                                        </span>
+                                        <span class="nav-link-title">سجل العمليات اليومية</span>
+                                    </a>
+                                </li>
+                            }
                             @if (User.IsInRole("Admin"))
                             {
                                 <div class="nav-item-header">التقارير والمراقبة</div>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Reports/Index">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M8 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h5.697" /><path d="M18 14v4h4" /><path d="M18 11v-4a2 2 0 0 0 -2 -2h-2" /><path d="M8 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 -2h-2a2 2 0 0 1 -2 -2z" /><path d="M14 11h-4v-4" /><path d="M14 15h-4" /><path d="M15 22l4 -4" /></svg>
+                                        </span>
+                                        <span class="nav-link-title">التقارير الشاملة</span>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/Shifts/History">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block text-success">

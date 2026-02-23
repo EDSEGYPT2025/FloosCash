@@ -14,11 +14,14 @@
         <p class="empty-subtitle text-muted fs-4">
             للبدء في تسجيل العمليات ورؤية الإحصائيات، يرجى فتح وردية جديدة وتسجيل عهدة الكاشير.
         </p>
-        <div class="empty-action">
-            <a href="/Shifts/Create" class="btn btn-primary btn-lg">
-                فتح وردية جديدة
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="empty-action">
+                <a href="/Shifts/Create" class="btn btn-primary btn-lg">
+                    فتح وردية جديدة
+                </a>
+            </div>
+        }
     </div>
 }
 else
@@ -52,8 +55,99 @@ else
             </div>
         </div>
     }
-    <div class="row row-deck row-cards">
 
+    <div class="card mb-4 bg-primary-lt border-primary shadow-sm border-2">
+        <div class="card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <h3 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+                        المساعد الذكي:
+                    </h3>
+                    <span class="text-muted fs-5">للبحث عن محفظة جاهزة</span>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <div class="input-icon">
+                        <input type="number" id="smartAmount" class="form-control form-control-lg fw-bold" placeholder="أدخل المبلغ المطلوب...">
+                        <span class="input-icon-addon text-muted fw-bold">ج.م</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="smartType" class="form-select form-select-lg fw-bold text-primary">
+                        <option value="إيداع">العملية: إيداع</option>
+                        <option value="سحب">العملية: سحب</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mt-2 mt-md-0 text-center">
+                    <span id="smartResult" class="badge bg-success fs-5 py-2 px-3 w-100">عرض كل المحافظ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="page-title text-primary mb-3 mt-2">تفاصيل الخطوط النشطة بالوردية</h3>
+    <div class="row row-deck row-cards mb-4" id="walletsContainer">
+        @foreach (var wallet in Model.WalletSummaries)
+        {
+            <div class="col-md-6 col-xl-4 wallet-card"
+                 data-balance="@wallet.CurrentBalance"
+                 data-rem-dep="@wallet.RemainingDailyDeposit"
+                 data-rem-wdw="@wallet.RemainingDailyWithdrawal">
+
+                <div class="card shadow-sm border-0 border-top border-primary border-3 transition-all">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="subheader fw-bold fs-2 text-dark">@wallet.Name</div>
+                            <div class="ms-auto lh-1">
+                                <span class="badge bg-primary-lt fs-4 py-2 px-3 fw-bold">الرصيد: @wallet.CurrentBalance.ToString("N0") ج.م</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted fw-bold">باقي ليمت الإيداع (يومي)</span>
+                                <span class="fw-bolder text-success fs-4">@wallet.RemainingDailyDeposit.ToString("N0") ج</span>
+                            </div>
+                            <div class="progress progress-sm">
+                                @{
+                                    var depPerc = wallet.DailyDepositLimit > 0 ? ((wallet.DailyDepositLimit - wallet.RemainingDailyDeposit) / wallet.DailyDepositLimit) * 100 : 0;
+                                }
+                                <div class="progress-bar bg-success" style="width: @depPerc%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted fw-bold">باقي ليمت السحب (يومي)</span>
+                                <span class="fw-bolder text-danger fs-4">@wallet.RemainingDailyWithdrawal.ToString("N0") ج</span>
+                            </div>
+                            <div class="progress progress-sm">
+                                @{
+                                    var wdwPerc = wallet.DailyWithdrawalLimit > 0 ? ((wallet.DailyWithdrawalLimit - wallet.RemainingDailyWithdrawal) / wallet.DailyWithdrawalLimit) * 100 : 0;
+                                }
+                                <div class="progress-bar bg-danger" style="width: @wdwPerc%"></div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3" />
+
+                        <div class="row text-center">
+                            <div class="col">
+                                <div class="text-muted fw-bold mb-1">المتبقي شهري (إيداع)</div>
+                                <div class="fw-bolder text-success fs-3">@wallet.RemainingMonthlyDeposit.ToString("N0") ج</div>
+                            </div>
+                            <div class="col border-start">
+                                <div class="text-muted fw-bold mb-1">المتبقي شهري (سحب)</div>
+                                <div class="fw-bolder text-danger fs-3">@wallet.RemainingMonthlyWithdrawal.ToString("N0") ج</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3 class="page-title text-dark mb-3 mt-2">ملخص الوردية والدرج</h3>
+    <div class="row row-deck row-cards">
         <div class="col-sm-6 col-lg-3">
             <div class="card bg-primary text-primary-fg shadow-sm">
                 <div class="card-body">
@@ -101,13 +195,23 @@ else
         <div class="col-sm-6 col-lg-3">
             <div class="card shadow-sm border-start border-success border-4">
                 <div class="card-body">
-                    <h3 class="card-title fs-4 mb-2">الكاشير: @Model.ActiveShift.EmployeeName</h3>
+                    <h3 class="card-title fs-4 mb-2 text-truncate">الكاشير: @Model.ActiveShift.EmployeeName</h3>
                     <div class="text-muted mb-3 fs-5">وقت الفتح: @Model.ActiveShift.StartTime.ToString("hh:mm tt")</div>
 
-                    <a href="/Shifts/Close" class="btn btn-outline-danger w-100 mt-2 fw-bold">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
-                        إغلاق الوردية وتسوية العهدة
-                    </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <button type="button" onclick="showAdminWarning()" class="btn btn-outline-danger w-100 mt-2 fw-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
+                            إغلاق الوردية
+                        </button>
+                    }
+                    else
+                    {
+                        <a href="/Shifts/Close" class="btn btn-outline-danger w-100 mt-2 fw-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
+                            إغلاق الوردية
+                        </a>
+                    }
                 </div>
             </div>
         </div>
@@ -116,7 +220,10 @@ else
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title text-muted fw-bold">أحدث العمليات المسجلة بالوردية</h3>
-                    <a href="/Operations/Create" class="btn btn-sm btn-primary">تسجيل عملية جديدة</a>
+                    @if (User.IsInRole("Cashier"))
+                    {
+                        <a href="/Operations/Create" class="btn btn-sm btn-primary">تسجيل عملية جديدة</a>
+                    }
                 </div>
                 <div class="table-responsive">
                     <table class="table card-table table-vcenter text-nowrap datatable table-hover">
@@ -171,4 +278,86 @@ else
         </div>
 
     </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .swal2-popup, .swal2-title, .swal2-html-container, .swal2-confirm {
+            font-family: 'Cairo', sans-serif !important;
+            direction: rtl !important;
+        }
+    </style>
+    <script>
+        // رسالة التنبيه للمدير
+        function showAdminWarning() {
+            Swal.fire({
+                icon: 'error',
+                title: 'غير مصرح!',
+                text: 'إغلاق الوردية وتسوية العهدة هو من تخصص الكاشير (صاحب الوردية) فقط لضمان دقة الحسابات.',
+                confirmButtonText: 'حسناً، فهمت',
+                confirmButtonColor: '#d63939',
+                customClass: {
+                    title: 'fs-2 fw-bold',
+                    popup: 'rounded-4 shadow-sm border-0',
+                    confirmButton: 'btn btn-danger btn-lg px-4'
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const amountInput = document.getElementById('smartAmount');
+            const typeSelect = document.getElementById('smartType');
+            const cards = document.querySelectorAll('.wallet-card');
+            const resultBadge = document.getElementById('smartResult');
+
+            function filterWallets() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const type = typeSelect.value;
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    if (amount === 0) {
+                        card.classList.remove('d-none');
+                        visibleCount++;
+                        return;
+                    }
+
+                    const balance = parseFloat(card.getAttribute('data-balance'));
+                    const remDep = parseFloat(card.getAttribute('data-rem-dep'));
+                    const remWdw = parseFloat(card.getAttribute('data-rem-wdw'));
+
+                    let isEligible = false;
+                    if (type === 'إيداع') {
+                        isEligible = amount <= remDep;
+                    } else if (type === 'سحب') {
+                        isEligible = amount <= balance && amount <= remWdw;
+                    }
+
+                    if (isEligible) {
+                        card.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('d-none');
+                    }
+                });
+
+                if (amount === 0) {
+                    resultBadge.className = 'badge bg-success fs-5 py-2 px-3 w-100';
+                    resultBadge.innerText = 'عرض كل المحافظ';
+                } else if (visibleCount > 0) {
+                    resultBadge.className = 'badge bg-primary fs-5 py-2 px-3 w-100';
+                    resultBadge.innerText = `متاح ${visibleCount} محفظة`;
+                } else {
+                    resultBadge.className = 'badge bg-danger fs-5 py-2 px-3 w-100';
+                    resultBadge.innerText = 'لا توجد محفظة تصلح!';
+                }
+            }
+
+            if(amountInput && typeSelect) {
+                amountInput.addEventListener('input', filterWallets);
+                typeSelect.addEventListener('change', filterWallets);
+            }
+        });
+    </script>
 }

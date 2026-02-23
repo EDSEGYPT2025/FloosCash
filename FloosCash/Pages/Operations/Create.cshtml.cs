@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace FloosCash.Pages.Operations
 {
-    [Authorize]
+    [Authorize(Roles = "Cashier")]
     public class CreateModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -28,15 +28,16 @@ namespace FloosCash.Pages.Operations
 
         public string WalletsJson { get; set; } = "[]";
 
+        // --- التعديل: خاصية رصيد الدرج ---
+        public decimal ExpectedDrawerCash { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
-            // --- التعديل: جلب الوردية مع المحافظ والموظفين ---
             ActiveShift = await _context.Shifts
                 .Include(s => s.AllowedWallets)
                 .Include(s => s.Cashiers)
                 .FirstOrDefaultAsync(s => !s.IsClosed);
 
-            // --- حماية إضافية للكاشير غير المسموح له ---
             if (ActiveShift != null && User.IsInRole("Cashier"))
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -44,7 +45,7 @@ namespace FloosCash.Pages.Operations
                 {
                     if (!ActiveShift.Cashiers.Any(c => c.Id == userId))
                     {
-                        return RedirectToPage("/Index"); // طرد الكاشير من الصفحة
+                        return RedirectToPage("/Index");
                     }
                 }
             }
@@ -54,16 +55,7 @@ namespace FloosCash.Pages.Operations
                 return RedirectToPage("/Shifts/Create");
             }
 
-            // عرض المحافظ الخاصة بهذه الوردية فقط
-            var allowedWallets = ActiveShift.AllowedWallets.Where(w => w.IsActive).ToList();
-            WalletsList = new SelectList(allowedWallets, "Id", "Name");
-
-            WalletsJson = JsonSerializer.Serialize(allowedWallets.Select(w => new {
-                id = w.Id,
-                depositRate = w.DepositCommissionRate,
-                withdrawalRate = w.WithdrawalCommissionRate
-            }));
-
+            await LoadFormData();
             return Page();
         }
 
@@ -74,7 +66,6 @@ namespace FloosCash.Pages.Operations
                 .Include(s => s.Cashiers)
                 .FirstOrDefaultAsync(s => !s.IsClosed);
 
-            // التأكد مرة أخرى عند الحفظ
             if (ActiveShift != null && User.IsInRole("Cashier"))
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -89,13 +80,14 @@ namespace FloosCash.Pages.Operations
 
             if (ActiveShift == null) return RedirectToPage("/Shifts/Create");
 
+            // نحمل البيانات أولاً لكي تكون جاهزة (مثل رصيد الدرج) لو حدث خطأ وأعدنا عرض الصفحة
+            await LoadFormData();
+
             var wallet = await _context.Wallets.FindAsync(Operation.WalletId);
 
-            // حماية إضافية: التأكد أن المحفظة المرسلة من الواجهة مسموح بها في هذه الوردية
             if (wallet == null || !ActiveShift.AllowedWallets.Any(w => w.Id == wallet.Id))
             {
                 ModelState.AddModelError(string.Empty, "عفواً، غير مصرح لك باستخدام هذه المحفظة في ورديتك الحالية.");
-                await LoadFormData();
                 return Page();
             }
 
@@ -112,16 +104,21 @@ namespace FloosCash.Pages.Operations
 
             if (Operation.OperationType == "إيداع")
             {
+                // --- التعديل: فحص رصيد المحفظة للإيداع ---
+                if (Operation.Amount > wallet.CurrentBalance)
+                {
+                    ModelState.AddModelError(string.Empty, $"عفواً، الرصيد الفعلي في المحفظة ({wallet.CurrentBalance} ج.م) لا يكفي لتحويل هذا المبلغ للعميل.");
+                    return Page();
+                }
+
                 if (todayTotal + Operation.Amount > wallet.DailyDepositLimit)
                 {
                     ModelState.AddModelError(string.Empty, $"عفواً، هذه العملية تتخطى حد الإيداع اليومي للمحفظة ({wallet.DailyDepositLimit} ج.م). المتبقي لليوم هو {wallet.DailyDepositLimit - todayTotal} ج.م.");
-                    await LoadFormData();
                     return Page();
                 }
                 if (monthTotal + Operation.Amount > wallet.MonthlyDepositLimit)
                 {
                     ModelState.AddModelError(string.Empty, $"عفواً، هذه العملية تتخطى حد الإيداع الشهري للمحفظة ({wallet.MonthlyDepositLimit} ج.م). المتبقي للشهر هو {wallet.MonthlyDepositLimit - monthTotal} ج.م.");
-                    await LoadFormData();
                     return Page();
                 }
 
@@ -132,16 +129,21 @@ namespace FloosCash.Pages.Operations
             }
             else if (Operation.OperationType == "سحب")
             {
+                // --- التعديل: فحص رصيد الدرج للسحب ---
+                if (Operation.Amount > ExpectedDrawerCash)
+                {
+                    ModelState.AddModelError(string.Empty, $"عفواً، النقدية المتاحة في الدرج ({ExpectedDrawerCash} ج.م) لا تكفي لتسليم هذا المبلغ للعميل.");
+                    return Page();
+                }
+
                 if (todayTotal + Operation.Amount > wallet.DailyWithdrawalLimit)
                 {
                     ModelState.AddModelError(string.Empty, $"عفواً، هذه العملية تتخطى حد السحب اليومي للمحفظة ({wallet.DailyWithdrawalLimit} ج.م). المتبقي لليوم هو {wallet.DailyWithdrawalLimit - todayTotal} ج.م.");
-                    await LoadFormData();
                     return Page();
                 }
                 if (monthTotal + Operation.Amount > wallet.MonthlyWithdrawalLimit)
                 {
                     ModelState.AddModelError(string.Empty, $"عفواً، هذه العملية تتخطى حد السحب الشهري للمحفظة ({wallet.MonthlyWithdrawalLimit} ج.م). المتبقي للشهر هو {wallet.MonthlyWithdrawalLimit - monthTotal} ج.م.");
-                    await LoadFormData();
                     return Page();
                 }
 
@@ -160,11 +162,11 @@ namespace FloosCash.Pages.Operations
             {
                 if (Operation.OperationType == "إيداع")
                 {
-                    wallet.CurrentBalance -= Operation.Amount;
+                    wallet.CurrentBalance -= Operation.Amount; // المحفظة تقل
                 }
                 else if (Operation.OperationType == "سحب")
                 {
-                    wallet.CurrentBalance += Operation.Amount;
+                    wallet.CurrentBalance += Operation.Amount; // المحفظة تزيد
                 }
 
                 _context.Operations.Add(Operation);
@@ -179,24 +181,60 @@ namespace FloosCash.Pages.Operations
             {
                 await transaction.RollbackAsync();
                 ModelState.AddModelError(string.Empty, "حدث خطأ أثناء حفظ العملية: " + ex.Message);
-                await LoadFormData();
                 return Page();
             }
         }
 
         private async Task LoadFormData()
         {
-            // إعادة تحميل الوردية ومحافظها
-            ActiveShift = await _context.Shifts.Include(s => s.AllowedWallets).FirstOrDefaultAsync(s => !s.IsClosed);
-            var allowedWallets = ActiveShift?.AllowedWallets.Where(w => w.IsActive).ToList() ?? new List<Wallet>();
+            if (ActiveShift == null) return;
 
+            var allowedWallets = ActiveShift.AllowedWallets.Where(w => w.IsActive).ToList();
             WalletsList = new SelectList(allowedWallets, "Id", "Name");
 
-            WalletsJson = JsonSerializer.Serialize(allowedWallets.Select(w => new {
-                id = w.Id,
-                depositRate = w.DepositCommissionRate,
-                withdrawalRate = w.WithdrawalCommissionRate
-            }));
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var allowedWalletIds = allowedWallets.Select(w => w.Id).ToList();
+
+            var shiftOperations = await _context.Operations
+                .Where(o => o.ShiftId == ActiveShift.Id)
+                .ToListAsync();
+
+            // --- التعديل: حساب رصيد الدرج الفعلي ---
+            var totalDeposits = shiftOperations.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
+            var totalWithdrawals = shiftOperations.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
+            var totalCommissions = shiftOperations.Sum(o => o.Commission);
+
+            ExpectedDrawerCash = ActiveShift.OpeningCash + totalDeposits - totalWithdrawals + totalCommissions;
+            // ----------------------------------------
+
+            var monthOperations = await _context.Operations
+                .Where(o => allowedWalletIds.Contains(o.WalletId) && o.Timestamp >= startOfMonth)
+                .ToListAsync();
+
+            var walletsData = allowedWallets.Select(w => {
+                var wMonthOps = monthOperations.Where(o => o.WalletId == w.Id).ToList();
+                var wTodayOps = wMonthOps.Where(o => o.Timestamp.Date == today).ToList();
+
+                var tDep = wTodayOps.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
+                var tWdw = wTodayOps.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
+                var mDep = wMonthOps.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
+                var mWdw = wMonthOps.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
+
+                return new
+                {
+                    id = w.Id,
+                    currentBalance = w.CurrentBalance,
+                    depositRate = w.DepositCommissionRate,
+                    withdrawalRate = w.WithdrawalCommissionRate,
+                    remainingDailyDeposit = w.DailyDepositLimit - tDep,
+                    remainingDailyWithdrawal = w.DailyWithdrawalLimit - tWdw,
+                    remainingMonthlyDeposit = w.MonthlyDepositLimit - mDep,
+                    remainingMonthlyWithdrawal = w.MonthlyWithdrawalLimit - mWdw
+                };
+            });
+
+            WalletsJson = JsonSerializer.Serialize(walletsData);
         }
     }
 }

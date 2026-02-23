@@ -1,0 +1,29 @@
+﻿@page
+@model FloosCash.Pages.AccessDeniedModel
+@{
+    ViewData["Title"] = "الدخول ممنوع - 403";
+}
+
+<div class="page-page-center mt-5">
+    <div class="container-tight py-4">
+        <div class="empty shadow-sm bg-white rounded-3 py-5">
+            <div class="empty-header text-danger mb-4" style="font-size: 6rem; font-weight: 800;">403</div>
+
+            <div class="empty-icon text-danger mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="64" height="64" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
+            </div>
+
+            <p class="empty-title fs-1 fw-bold text-dark">عفواً، لا تملك صلاحية الدخول!</p>
+            <p class="empty-subtitle text-muted fs-3 px-3">
+                هذه الصفحة مخصصة لمدير النظام أو للكاشير فقط حسب نوع الصلاحية. لا يمكنك الوصول إلى هذا الرابط بحسابك الحالي.
+            </p>
+
+            <div class="empty-action mt-4">
+                <a href="/" class="btn btn-primary btn-lg fs-3 fw-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+                    العودة للرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

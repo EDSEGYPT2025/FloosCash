@@ -28,47 +28,67 @@ namespace FloosCash.Pages
 
         public List<WalletAlert> Alerts { get; set; } = new List<WalletAlert>();
 
+        // --- القائمة الجديدة لعرض كروت المحافظ ---
+        public List<WalletSummaryCard> WalletSummaries { get; set; } = new List<WalletSummaryCard>();
+
         public async Task<IActionResult> OnGetAsync()
         {
-            // --- التعديل 1: جلب الوردية شاملة المحافظ والموظفين ---
             ActiveShift = await _context.Shifts
                 .Include(s => s.AllowedWallets)
-                .Include(s => s.Cashiers) // تم إضافة هذا السطر
+                .Include(s => s.Cashiers)
                 .FirstOrDefaultAsync(s => !s.IsClosed);
 
-            // --- التعديل 2: حماية الوردية (هل الكاشير الحالي من ضمن موظفيها؟) ---
             if (ActiveShift != null && User.IsInRole("Cashier"))
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (int.TryParse(userIdString, out int userId))
                 {
-                    // إذا لم يكن الموظف ضمن القائمة المحددة للوردية، قم بإخفائها عنه
                     if (!ActiveShift.Cashiers.Any(c => c.Id == userId))
                     {
                         ActiveShift = null;
                     }
                 }
             }
-            // ------------------------------------------------------------------
 
             if (ActiveShift != null)
             {
-                // 1. حساب إجمالي أرصدة "المحافظ المسلمة للموظف فقط" وليس الشركة كلها
                 var allowedWallets = ActiveShift.AllowedWallets.Where(w => w.IsActive).ToList();
                 TotalWalletsBalance = allowedWallets.Sum(w => w.CurrentBalance);
 
-                // 2. حساب تنبيهات المحافظ (الخاصة بالموظف فقط) لليوم الحالي
                 var today = DateTime.Today;
-                var todayOperations = await _context.Operations
-                    .Where(o => o.Timestamp.Date == today)
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                var allowedWalletIds = allowedWallets.Select(w => w.Id).ToList();
+
+                // جلب عمليات الشهر الحالي لتوفير الأداء وحساب الليمت الشهري واليومي معاً
+                var monthOperations = await _context.Operations
+                    .Where(o => allowedWalletIds.Contains(o.WalletId) && o.Timestamp >= startOfMonth)
                     .ToListAsync();
 
                 foreach (var wallet in allowedWallets)
                 {
-                    var walletTodayOps = todayOperations.Where(o => o.WalletId == wallet.Id).ToList();
+                    var walletMonthOps = monthOperations.Where(o => o.WalletId == wallet.Id).ToList();
+                    var walletTodayOps = walletMonthOps.Where(o => o.Timestamp.Date == today).ToList();
+
                     var todayDeposit = walletTodayOps.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
                     var todayWithdrawal = walletTodayOps.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
 
+                    var monthDeposit = walletMonthOps.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
+                    var monthWithdrawal = walletMonthOps.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
+
+                    // تعبئة بيانات الكارت لكل محفظة
+                    WalletSummaries.Add(new WalletSummaryCard
+                    {
+                        Name = wallet.Name,
+                        CurrentBalance = wallet.CurrentBalance,
+                        RemainingDailyDeposit = wallet.DailyDepositLimit - todayDeposit,
+                        RemainingDailyWithdrawal = wallet.DailyWithdrawalLimit - todayWithdrawal,
+                        RemainingMonthlyDeposit = wallet.MonthlyDepositLimit - monthDeposit,
+                        RemainingMonthlyWithdrawal = wallet.MonthlyWithdrawalLimit - monthWithdrawal,
+                        DailyDepositLimit = wallet.DailyDepositLimit,
+                        DailyWithdrawalLimit = wallet.DailyWithdrawalLimit
+                    });
+
+                    // التنبيهات (إذا تخطى 80% من الليمت اليومي)
                     if (wallet.DailyDepositLimit > 0 && (todayDeposit / wallet.DailyDepositLimit) >= 0.8m)
                     {
                         Alerts.Add(new WalletAlert
@@ -90,7 +110,6 @@ namespace FloosCash.Pages
                     }
                 }
 
-                // 3. جلب كل عمليات الوردية الحالية
                 var shiftOperations = await _context.Operations
                     .Where(o => o.ShiftId == ActiveShift.Id)
                     .ToListAsync();
@@ -98,13 +117,11 @@ namespace FloosCash.Pages
                 TotalOperationsCount = shiftOperations.Count;
                 TotalCommissions = shiftOperations.Sum(o => o.Commission);
 
-                // 4. الحسبة المحاسبية للنقدية المتوقعة في الدرج
                 var totalDeposits = shiftOperations.Where(o => o.OperationType == "إيداع").Sum(o => o.Amount);
                 var totalWithdrawals = shiftOperations.Where(o => o.OperationType == "سحب").Sum(o => o.Amount);
 
                 ExpectedDrawerCash = ActiveShift.OpeningCash + totalDeposits - totalWithdrawals + TotalCommissions;
 
-                // 5. جلب آخر 5 عمليات
                 RecentOperations = await _context.Operations
                     .Include(o => o.Wallet)
                     .Where(o => o.ShiftId == ActiveShift.Id)
@@ -122,5 +139,18 @@ namespace FloosCash.Pages
         public string WalletName { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public string Type { get; set; } = "warning";
+    }
+
+    // كلاس لتمرير بيانات كروت المحافظ للواجهة
+    public class WalletSummaryCard
+    {
+        public string Name { get; set; } = string.Empty;
+        public decimal CurrentBalance { get; set; }
+        public decimal RemainingDailyDeposit { get; set; }
+        public decimal RemainingDailyWithdrawal { get; set; }
+        public decimal RemainingMonthlyDeposit { get; set; }
+        public decimal RemainingMonthlyWithdrawal { get; set; }
+        public decimal DailyDepositLimit { get; set; }
+        public decimal DailyWithdrawalLimit { get; set; }
     }
 }

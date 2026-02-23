@@ -1,0 +1,148 @@
+﻿@page
+@model FloosCash.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "التقارير الشاملة";
+}
+
+<div class="row g-3 mb-4 d-print-none">
+    <div class="col-12">
+        <form method="get" class="card shadow-sm">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">من تاريخ:</label>
+                        <input type="date" asp-for="StartDate" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">إلى تاريخ:</label>
+                        <input type="date" asp-for="EndDate" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">تحديد محفظة معينة:</label>
+                        <select asp-for="WalletId" asp-items="Model.WalletsList" class="form-select">
+                            <option value="">-- كل المحافظ --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+                            بحث وفلترة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row row-cards mb-4">
+    <div class="col-sm-4">
+        <div class="card card-sm shadow-sm border-0 border-bottom border-success border-3">
+            <div class="card-body text-center">
+                <div class="text-muted fw-bold fs-3 mb-1">إجمالي الإيداعات</div>
+                <div class="fs-1 fw-bolder text-success">@Model.TotalDeposits.ToString("N0") ج.م</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card card-sm shadow-sm border-0 border-bottom border-danger border-3">
+            <div class="card-body text-center">
+                <div class="text-muted fw-bold fs-3 mb-1">إجمالي السحوبات</div>
+                <div class="fs-1 fw-bolder text-danger">@Model.TotalWithdrawals.ToString("N0") ج.م</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card card-sm shadow-sm border-0 border-bottom border-primary border-3 bg-primary-lt">
+            <div class="card-body text-center">
+                <div class="text-primary fw-bold fs-3 mb-1">صافي أرباح العمولات</div>
+                <div class="fs-1 fw-bolder text-primary">@Model.TotalCommissions.ToString("N2") ج.م</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title fw-bold">تفاصيل العمليات للفترة المحددة</h3>
+        <button onclick="window.print();" class="btn btn-outline-secondary d-print-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
+            طباعة التقرير
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap table-hover">
+            <thead>
+                <tr>
+                    <th>التاريخ والوقت</th>
+                    <th>الكاشير (الوردية)</th>
+                    <th>المحفظة</th>
+                    <th>النوع</th>
+                    <th>المبلغ</th>
+                    <th>العمولة</th>
+                    <th>ملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ReportOperations.Any())
+                {
+                    @foreach (var op in Model.ReportOperations)
+                    {
+                        <tr>
+                            <td>@op.Timestamp.ToString("yyyy-MM-dd hh:mm tt")</td>
+                            <td class="text-muted">
+                                @(op.Shift?.EmployeeName ?? "غير محدد")
+                            </td>
+                            <td class="fw-bold">@op.Wallet.Name</td>
+                            <td>
+                                @if (op.OperationType == "إيداع")
+                                {
+                                    <span class="text-success fw-bold">إيداع</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger fw-bold">سحب</span>
+                                }
+                            </td>
+                            <td class="fw-bold fs-3">@op.Amount.ToString("N0") ج</td>
+                            <td>@op.Commission ج</td>
+                            <td class="text-muted">@op.Notes</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted fs-3">لا توجد أي عمليات تطابق معايير البحث المحددة.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* تحسين شكل الصفحة عند الطباعة */
+    @@media print {
+        body {
+            background-color: #fff;
+        }
+
+        .navbar, .sidebar, .page-header {
+            display: none !important;
+        }
+
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        table {
+            border: 1px solid #dee2e6;
+        }
+
+        th, td {
+            border-bottom: 1px solid #dee2e6;
+        }
+    }
+</style>

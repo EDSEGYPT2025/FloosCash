@@ -5,8 +5,52 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-xl-10">
 
+        <h3 class="page-title text-primary mb-3 mt-2">مراجعة أرصدة الخطوط قبل الإغلاق</h3>
+        <div class="row row-deck row-cards mb-4">
+            @foreach (var wallet in Model.WalletSummaries)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm border-0 border-top border-primary border-3">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="subheader fw-bold fs-3 text-dark">@wallet.Name</div>
+                                <div class="ms-auto lh-1">
+                                    <span class="badge bg-primary-lt fs-5 py-1 px-2 fw-bold">الرصيد: @wallet.CurrentBalance.ToString("N0") ج.م</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between mb-1 fs-5">
+                                    <span class="text-muted fw-bold">باقي ليمت الإيداع (يومي)</span>
+                                    <span class="fw-bolder text-success">@wallet.RemainingDailyDeposit.ToString("N0") ج</span>
+                                </div>
+                                <div class="progress progress-sm">
+                                    @{
+                                        var depPerc = wallet.DailyDepositLimit > 0 ? ((wallet.DailyDepositLimit - wallet.RemainingDailyDeposit) / wallet.DailyDepositLimit) * 100 : 0;
+                                    }
+                                    <div class="progress-bar bg-success" style="width: @depPerc%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1 fs-5">
+                                    <span class="text-muted fw-bold">باقي ليمت السحب (يومي)</span>
+                                    <span class="fw-bolder text-danger">@wallet.RemainingDailyWithdrawal.ToString("N0") ج</span>
+                                </div>
+                                <div class="progress progress-sm">
+                                    @{
+                                        var wdwPerc = wallet.DailyWithdrawalLimit > 0 ? ((wallet.DailyWithdrawalLimit - wallet.RemainingDailyWithdrawal) / wallet.DailyWithdrawalLimit) * 100 : 0;
+                                    }
+                                    <div class="progress-bar bg-danger" style="width: @wdwPerc%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-danger text-white">
                 <h3 class="card-title fw-bold">تسوية وتقفيل وردية الكاشير: @Model.ActiveShift.EmployeeName</h3>
